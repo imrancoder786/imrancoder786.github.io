@@ -13,19 +13,19 @@ window.PORTFOLIO_DATA = {
     location: "Thanjavur, India",
     lastUpdated: "2026",
     bio: [
-      "I’m <strong>Imrankhan</strong>, an undergraduate in Computer Science at M.A.M School of Engineering (2023–2027), based in Thanjavur, India. I work on deep learning and want to become an AI researcher.",
+      "I’m <strong>Imrankhan</strong>, an undergraduate in Computer Science at M.A.M School of Engineering (2023–2027), based in Thanjavur, India. I work on deep learning and want to become an AI researcher.",//My work combines practical deep learning with a focus on core AI research problems.
       "My interests sit around <em>large language models</em>, <em>transformers</em>, <em>multimodal reasoning</em>, <em>self-supervised pre-training</em> (JEPA-style objectives), <em>vision models</em>, and <em>reinforcement learning</em>. I like projects where careful data handling and small-scale experiments still teach something concrete — e.g. training an EDSR super-resolution network on 300 telescope images, or reimplementing SVD from scratch to see the linear algebra fall out.",
-      "I’m currently <span class=\"dotted-underline\">looking for research internships</span> for 2026. If you’re working on foundation models, multimodal learning, or efficient training and think I could contribute, I’d love to hear from you."
+      "I’m currently <span class=\"dotted-underline\">looking for research internships</span> for 2026. If you are working on any of these areas and think I could contribute, I’d love to hear from you."
     ]
   },
   
   selectedWork: [
     {
-      year: "2025",
+      year: "2026",
       text: "EDSR super-resolution on real HSC/HST telescope imagery (PSNR 23.58 → 35.65 dB)."
     },
     {
-      year: "2025",
+      year: "2026",
       text: "SVD engine from scratch: image compression, LSA, collaborative filtering."
     },
     {
@@ -76,7 +76,7 @@ window.PORTFOLIO_DATA = {
         "Improved PSNR from 23.58 dB → 35.65 dB and SSIM from 0.3724 → 0.8853 over the bicubic baseline.",
         "Reduced MSE to 6.83e-4 on held-out patches."
       ],
-      links: [{ label: "GitHub", href: "https://github.com/imrancoder786" }]
+      links: [{ label: "GitHub", href: "https://github.com/imrancoder786/DeepLense__test/tree/main/project_task/task_2" }]
     },
     {
       title: "Singular Value Decomposition (SVD) Engine",
@@ -86,7 +86,7 @@ window.PORTFOLIO_DATA = {
         "Applied Truncated SVD to image compression (CV) and Latent Semantic Analysis (NLP).",
         "Implemented collaborative filtering with matrix imputation for movie-rating prediction."
       ],
-      links: [{ label: "GitHub", href: "https://github.com/imrancoder786" }]
+      links: [{ label: "GitHub", href: "https://github.com/imrancoder786/SVD_from_scratch" }]
     },
     {
       title: "Desktop Automation Agent",
@@ -97,7 +97,7 @@ window.PORTFOLIO_DATA = {
         "LLM reasoning layer for meeting summarization, scheduling, and IMAP email automation.",
         "Robust error handling for tool failures and noisy audio to keep real-time interaction stable."
       ],
-      links: [{ label: "GitHub", href: "https://github.com/imrancoder786" }]
+      // links: [{ label: "GitHub", href: "https://github.com/imrancoder786" }]
     }
   ],
   

@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <a href="${profile.github}" target="_blank" rel="noreferrer">GitHub</a>
       <a href="${profile.linkedin}" target="_blank" rel="noreferrer">LinkedIn</a>
       <a href="${profile.twitter}" target="_blank" rel="noreferrer">X</a>
-      <span class="ml-auto">${profile.location} · Last updated ${profile.lastUpdated}</span>
+      <span class="ml-auto"> Last updated ${profile.lastUpdated}</span>
     `;
   }
 
