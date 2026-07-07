@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="icon" href="my_code_imge.png" type="image/png">
+</head>
+<body>
+    <div class="min-h-screen">
+        <div class="layout-wrapper">
+            <header></header>
+            
+            <main id="post-content">
+                <!-- Blog post content will be dynamically rendered here -->
+            </main>
+            
+            <footer></footer>
+        </div>
+    </div>
+    
+    <script src="data.js"></script>
+    <script src="layout.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const posts = window.PORTFOLIO_DATA.posts;
+            const contentContainer = document.getElementById("post-content");
+            
+            // Extract post query param
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('post');
+            
+            const post = posts.find(p => p.slug === slug);
+            
+            if (!post) {
+                document.title = `Post Not Found — ${window.PORTFOLIO_DATA.profile.name}`;
+                contentContainer.innerHTML = `
+                    <h1 class="text-[26px] font-medium tracking-tight mb-6 pb-2 rule">Post not found</h1>
+                    <p class="text-muted-foreground">
+                        <a href="blog.html">Back to the blog</a>.
+                    </p>
+                `;
+                return;
+            }
+
+            // Set document title
+            document.title = `${post.title} — ${window.PORTFOLIO_DATA.profile.name}`;
+
+            // Parse body paragraphs
+            const paragraphs = post.body.split(/\n\n+/);
+            let paragraphsHtml = "";
+            paragraphs.forEach(p => {
+                if (p.trim()) {
+                    paragraphsHtml += `<p>${p.trim().replace(/\n/g, '<br>')}</p>`;
+                }
+            });
+
+            contentContainer.innerHTML = `
+                <div class="font-sans text-[12px] text-muted-foreground uppercase tracking-wide mb-2">
+                    ${post.date}
+                </div>
+                <h1 class="text-[28px] font-medium tracking-tight mb-6 pb-2 rule">
+                    ${post.title}
+                </h1>
+                <article class="space-y-5">
+                    ${paragraphsHtml}
+                </article>
+                <div class="mt-12 font-sans text-[14px]">
+                    <a href="blog.html">← All posts</a>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>

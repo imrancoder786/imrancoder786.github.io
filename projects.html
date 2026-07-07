@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="icon" href="my_code_imge.png" type="image/png">
+</head>
+<body>
+    <div class="min-h-screen">
+        <div class="layout-wrapper">
+            <header></header>
+            
+            <main>
+                <h1 class="text-[26px] font-medium tracking-tight mb-6 pb-2 rule">Projects</h1>
+                <div class="space-y-10" id="projects-list">
+                    <!-- Projects will be dynamically inserted here -->
+                </div>
+            </main>
+            
+            <footer></footer>
+        </div>
+    </div>
+    
+    <script src="data.js"></script>
+    <script src="layout.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const projects = window.PORTFOLIO_DATA.projects;
+            const container = document.getElementById("projects-list");
+            
+            if (projects.length === 0) {
+                container.innerHTML = '<p class="text-muted-foreground">No projects listed yet.</p>';
+                return;
+            }
+
+            projects.forEach(p => {
+                const article = document.createElement("article");
+                
+                // Stack and Date line
+                const metadataText = p.date ? `${p.stack} · ${p.date}` : p.stack;
+                
+                // Bullets list
+                let bulletsHtml = "";
+                if (p.bullets && p.bullets.length > 0) {
+                    bulletsHtml = `<ul class="list-disc pl-5 space-y-1 text-[15.5px]">`;
+                    p.bullets.forEach(b => {
+                        bulletsHtml += `<li>${b}</li>`;
+                    });
+                    bulletsHtml += `</ul>`;
+                }
+
+                // Links
+                let linksHtml = "";
+                if (p.links && p.links.length > 0) {
+                    linksHtml = `<div class="font-sans text-[13px] mt-2">`;
+                    p.links.forEach((l, idx) => {
+                        if (idx > 0) linksHtml += " · ";
+                        linksHtml += `<a href="${l.href}" target="_blank" rel="noreferrer">${l.label}</a>`;
+                    });
+                    linksHtml += `</div>`;
+                }
+
+                article.innerHTML = `
+                    <h3 class="font-serif text-[20px] mb-1">${p.title}</h3>
+                    <div class="font-sans text-[13px] text-muted-foreground mb-2">${metadataText}</div>
+                    <p class="mb-2">${p.summary}</p>
+                    ${bulletsHtml}
+                    ${linksHtml}
+                `;
+                
+                container.appendChild(article);
+            });
+        });
+    </script>
+</body>
+</html>

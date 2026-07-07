@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publications</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="icon" href="my_code_imge.png" type="image/png">
+</head>
+<body>
+    <div class="min-h-screen">
+        <div class="layout-wrapper">
+            <header></header>
+            
+            <main>
+                <h1 class="text-[26px] font-medium tracking-tight mb-6 pb-2 rule">Publications</h1>
+                <div id="publications-container">
+                    <!-- Publications will be dynamically inserted here -->
+                </div>
+            </main>
+            
+            <footer></footer>
+        </div>
+    </div>
+    
+    <script src="data.js"></script>
+    <script src="layout.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const publications = window.PORTFOLIO_DATA.publications;
+            const container = document.getElementById("publications-container");
+            
+            if (!publications || publications.length === 0) {
+                container.innerHTML = `
+                    <p class="text-muted-foreground">
+                        No publications yet — work in preparation. This page will list preprints,
+                        workshop papers, and peer-reviewed articles as they appear.
+                    </p>
+                `;
+                return;
+            }
+
+            const ol = document.createElement("ol");
+            ol.className = "space-y-6 list-decimal pl-5";
+
+            publications.forEach(p => {
+                const li = document.createElement("li");
+                
+                // Links rendering
+                let linksHtml = "";
+                if (p.links && p.links.length > 0) {
+                    linksHtml = `<div class="font-sans text-[13px] mt-1">`;
+                    p.links.forEach((l, idx) => {
+                        if (idx > 0) linksHtml += " · ";
+                        linksHtml += `<a href="${l.href}" target="_blank" rel="noreferrer">${l.label}</a>`;
+                    });
+                    linksHtml += `</div>`;
+                }
+
+                // Note rendering
+                const noteHtml = p.note ? `<p class="mt-1 text-[15px]">${p.note}</p>` : "";
+
+                li.innerHTML = `
+                    <div class="font-serif text-[18px]">${p.title}</div>
+                    <div class="font-sans text-[14px] text-muted-foreground">
+                        ${p.authors}. <em>${p.venue}</em>, ${p.year}.
+                    </div>
+                    ${noteHtml}
+                    ${linksHtml}
+                `;
+                ol.appendChild(li);
+            });
+            container.appendChild(ol);
+        });
+    </script>
+</body>
+</html>
