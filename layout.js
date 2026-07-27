@@ -2,6 +2,12 @@
 // Injects the shared header and footer dynamically using values from data.js
 // Highlights the current page in the navigation bar.
 
+// Clean URL: Redirect /index.html to /
+if (window.location.pathname.endsWith('/index.html')) {
+  const cleanPath = window.location.pathname.replace(/\/index\.html$/, '/') + window.location.search + window.location.hash;
+  window.location.replace(cleanPath);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Check if PORTFOLIO_DATA exists
   if (!window.PORTFOLIO_DATA) {
@@ -22,9 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (headerEl) {
     headerEl.className = "mb-14";
     headerEl.innerHTML = `
-      <a href="index.html" class="logo">${profile.name}</a>
+      <a href="./" class="logo">${profile.name}</a>
       <nav class="font-sans mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[13px] text-muted-foreground">
-        <a href="index.html" class="nav-link" id="nav-about">About</a>
+        <a href="./" class="nav-link" id="nav-about">About</a>
         <a href="research.html" class="nav-link" id="nav-research">Research</a>
         <a href="projects.html" class="nav-link" id="nav-projects">Projects</a>
         <a href="publications.html" class="nav-link" id="nav-publications">Publications</a>
