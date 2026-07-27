@@ -9,6 +9,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <link rel="icon" href="my_code_imge.png" type="image/png">
+    
+    <!-- KaTeX Math CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <!-- VS Code Dark Code Highlighting CSS & JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+
+    <!-- Marked JS & Extensions -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked-katex-extension/lib/index.umd.js"></script>
+
+    <!-- Mermaid JS -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head>
 <body>
     <div class="min-h-screen">
@@ -26,9 +43,14 @@
     <script src="data.js"></script>
     <script src="layout.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             const posts = window.PORTFOLIO_DATA.posts;
             const contentContainer = document.getElementById("post-content");
+            
+            // Register Marked Extensions
+            if (typeof marked !== "undefined" && typeof markedKatex !== "undefined") {
+                marked.use(markedKatex({ throwOnError: false }));
+            }
             
             // Extract post query param
             const urlParams = new URLSearchParams(window.location.search);
@@ -50,14 +72,21 @@
             // Set document title
             document.title = `${post.title} — ${window.PORTFOLIO_DATA.profile.name}`;
 
-            // Parse body paragraphs
-            const paragraphs = post.body.split(/\n\n+/);
-            let paragraphsHtml = "";
-            paragraphs.forEach(p => {
-                if (p.trim()) {
-                    paragraphsHtml += `<p>${p.trim().replace(/\n/g, '<br>')}</p>`;
+            let articleHtml = "";
+
+            if (post.file) {
+                const filePath = post.file.replace(/\\/g, '/');
+                try {
+                    const response = await fetch(filePath);
+                    if (!response.ok) throw new Error("Could not load post file");
+                    const markdownText = await response.text();
+                    articleHtml = typeof marked !== "undefined" ? marked.parse(markdownText) : markdownText;
+                } catch (err) {
+                    articleHtml = `<p class="text-muted-foreground">Error loading article content from ${filePath}.</p>`;
                 }
-            });
+            } else if (post.body) {
+                articleHtml = typeof marked !== "undefined" ? marked.parse(post.body) : post.body.replace(/\n\n+/g, '</p><p>');
+            }
 
             contentContainer.innerHTML = `
                 <div class="font-sans text-[12px] text-muted-foreground uppercase tracking-wide mb-2">
@@ -66,13 +95,49 @@
                 <h1 class="text-[28px] font-medium tracking-tight mb-6 pb-2 rule">
                     ${post.title}
                 </h1>
-                <article class="space-y-5">
-                    ${paragraphsHtml}
+                <article class="markdown-body">
+                    ${articleHtml}
                 </article>
                 <div class="mt-12 font-sans text-[14px]">
                     <a href="blog.html">← All posts</a>
                 </div>
             `;
+
+            // 1. VS Code Syntax Highlighting
+            if (typeof hljs !== "undefined") {
+                hljs.highlightAll();
+            }
+
+            // 2. KaTeX Math Equation Renderer
+            if (typeof renderMathInElement !== "undefined") {
+                renderMathInElement(contentContainer, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+
+            // 3. Render Mermaid Diagrams
+            if (typeof mermaid !== "undefined") {
+                try {
+                    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+                    const codeBlocks = contentContainer.querySelectorAll('pre code.language-mermaid, pre code.lang-mermaid');
+                    codeBlocks.forEach(code => {
+                        const pre = code.parentElement;
+                        const div = document.createElement('div');
+                        div.className = 'mermaid';
+                        div.textContent = code.textContent;
+                        pre.parentElement.replaceChild(div, pre);
+                    });
+                    await mermaid.run();
+                } catch (e) {
+                    console.warn("Mermaid render error:", e);
+                }
+            }
         });
     </script>
 </body>

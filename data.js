@@ -118,16 +118,13 @@ window.PORTFOLIO_DATA = {
   ],
   */
   
-  posts: [] // Empty state ready for future blog posts. Example:
-  /*
   posts: [
     {
-      slug: "understanding-jepa-architectures",
-      title: "Understanding Joint Embedding Predictive Architectures (JEPA)",
-      date: "2026-07-07",
-      summary: "An intuitive dive into Yann LeCun's JEPA model, how it differs from generative/reconstructive models, and why representation space matters.",
-      body: "Joint Embedding Predictive Architectures (JEPA) represent a paradigm shift in self-supervised learning.\n\nUnlike standard autoencoders or diffusion models that try to reconstruct pixels, JEPA predicts representation embeddings of the target images in a latent space.\n\nThis prevents the model from wasting capacity on fine-grained pixel details (like leaves on a tree blowing in the wind) and instead forces it to learn higher-level semantic structures."
+      slug: "transformer-from-scratch",
+      title: "Transformer From Scratch — English-to-Tamil Translation",
+      date: "2026-07-20",
+      summary: "Reproduce the paper 'ATTENTION IS ALL YOU NEED' and build a Transformer from scratch for English-to-Tamil translation.",
+      file: "posts/transformer_from_scratch.md"
     }
   ]
-  */
 };
