@@ -123,7 +123,7 @@ window.PORTFOLIO_DATA = {
       slug: "transformer-from-scratch",
       title: "Transformer From Scratch — English-to-Tamil Translation",
       date: "2026-07-20",
-      summary: "Reproduce the paper 'ATTENTION IS ALL YOU NEED' and build a Transformer from scratch for English-to-Tamil translation.",
+      summary: "A complete step-by-step PyTorch tutorial and mathematical guide to building the Transformer architecture from scratch ('Attention Is All You Need') for English-to-Tamil machine translation.",
       file: "posts/transformer_from_scratch.md"
     }
   ]

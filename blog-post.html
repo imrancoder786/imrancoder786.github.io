@@ -3,7 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Post</title>
+    <title>Blog Post | Imrankhan</title>
+    <meta name="description" content="Technical AI research and deep learning blog post by Imrankhan.">
+    <meta name="keywords" content="Machine Learning, Deep Learning, PyTorch, AI Research, Imrankhan">
+    <link rel="canonical" href="https://imrancoder786.github.io/blog-post.html">
+    
+    <!-- Open Graph & Social Media SEO -->
+    <meta property="og:title" content="Blog Post | Imrankhan">
+    <meta property="og:description" content="Technical AI research and deep learning blog post by Imrankhan.">
+    <meta property="og:url" content="https://imrancoder786.github.io/blog-post.html">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://imrancoder786.github.io/imrankhan.jpg">
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog Post | Imrankhan">
+    <meta name="twitter:description" content="Technical AI research and deep learning blog post by Imrankhan.">
+    <meta name="twitter:image" content="https://imrancoder786.github.io/imrankhan.jpg">
+
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,8 +86,48 @@
                 return;
             }
 
-            // Set document title
-            document.title = `${post.title} — ${window.PORTFOLIO_DATA.profile.name}`;
+            // Set document title and SEO metadata dynamically
+            const pageTitle = `${post.title} — ${window.PORTFOLIO_DATA.profile.name}`;
+            document.title = pageTitle;
+
+            const canonicalUrl = `https://imrancoder786.github.io/blog-post.html?post=${encodeURIComponent(slug)}`;
+            const metaDesc = post.summary || `Technical blog post on ${post.title} by Imrankhan`;
+
+            const setMeta = (selector, attr, value) => {
+                let el = document.querySelector(selector);
+                if (el) el.setAttribute(attr, value);
+            };
+
+            setMeta('meta[name="description"]', 'content', metaDesc);
+            setMeta('meta[property="og:title"]', 'content', pageTitle);
+            setMeta('meta[property="og:description"]', 'content', metaDesc);
+            setMeta('meta[property="og:url"]', 'content', canonicalUrl);
+            setMeta('meta[name="twitter:title"]', 'content', pageTitle);
+            setMeta('meta[name="twitter:description"]', 'content', metaDesc);
+            setMeta('link[rel="canonical"]', 'href', canonicalUrl);
+
+            // Inject Schema.org JSON-LD Structured Data for Google Rich Snippets
+            const schemaData = {
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                "headline": post.title,
+                "description": metaDesc,
+                "author": {
+                    "@type": "Person",
+                    "name": window.PORTFOLIO_DATA.profile.name,
+                    "url": "https://imrancoder786.github.io/"
+                },
+                "datePublished": post.date,
+                "mainEntityOfPage": canonicalUrl
+            };
+            let schemaScript = document.getElementById("json-ld-schema");
+            if (!schemaScript) {
+                schemaScript = document.createElement("script");
+                schemaScript.id = "json-ld-schema";
+                schemaScript.type = "application/ld+json";
+                document.head.appendChild(schemaScript);
+            }
+            schemaScript.textContent = JSON.stringify(schemaData);
 
             let articleHtml = "";
 
