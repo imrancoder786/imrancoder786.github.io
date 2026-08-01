@@ -4,8 +4,6 @@
 > **Date:** July 30, 2026<br>
 > **Paper:** [Kimi K3 Technical Report (arXiv 2607.24653)](https://arxiv.org/abs/2607.24653)<br>
 > **Weights:** [moonshotai/Kimi-K3 on Hugging Face](https://huggingface.co/moonshotai/Kimi-K3)<br>
-> **Visual Walkthrough:** [k3kimi.netlify.app](https://k3kimi.netlify.app/)<br>
-> **Architecture Notes:** [Sebastian Raschka](https://sebastianraschka.com/blog/2026/kimi-k3-architecture-notes.html)
 
 ---
 <details>
@@ -167,11 +165,11 @@ Almost nothing survived the K2 → K3 transition untouched. Here is the full arc
     <img src="posts/images/kad.png" alt="positional embedding" width="600">
 </div>
 
-### **5.1 The Problem: Softmax Attention Doesn't Scale to 1M Tokens**
+### 5.1 The Problem: Softmax Attention Doesn't Scale to 1M Tokens
 
 Standard softmax attention keeps **every past token** as a key-value pair in memory. The KV cache grows linearly with context length — at 1 million tokens, this is computationally expensive . This is the fundamental bottleneck for long-context models.
 
-### **5.2 The KDA Solution: Fixed-Size Recurrent Memory**
+### 5.2 The KDA Solution: Fixed-Size Recurrent Memory
 
 KDA replaces softmax attention with a **linear-attention recurrence** that maintains a **fixed-size matrix state** $S_t$. This state is updated once per token with two key mechanisms:
 
@@ -191,7 +189,7 @@ Reading this equation right to left:
 
 4. **$S_t^\top \cdot q_t$** — **Read operation**: Simple read of the state through the query.
 
-### **5.3 Projections: How Q, K, V Are Computed**
+### 5.3 Projections: How Q, K, V Are Computed
 
 The query, key, and value projections use a **short convolution** for local context and **L2-normalisation** for stability:
 
@@ -201,7 +199,7 @@ $$\beta_t^h = \text{Sigmoid}\left(W_\beta^h \cdot x_t\right)$$
 
 The **ShortConv** (kernel size 4, per the released config) lets each position peek at its immediate neighbours before the recurrence sees it — cheap local context that the linear state doesn't have to store. **L2-normalising q and k** bounds the delta-rule projection, critical for stability.
 
-### **5.4 The $g_{\min}$ Bound: Algorithm–System Co-design**
+### 5.4 The $g_{\min}$ Bound: Algorithm–System Co-design
 
 In the chunkwise-parallel implementation, recurrences are processed in chunks (GPUs hate serial work). This requires rescaling keys by the reciprocal of cumulative decay — which **can blow up without bound** and overflow in low precision.
 
@@ -224,7 +222,7 @@ With **$g_{\min} = -5$** (fixed) and $A_h$ learnable per head (initialised to 0)
     <img src="posts/images/k3_bound.png" alt="positional embedding" width="700">
 </div>
 
-### **5.5 Chunkwise Parallel Form**
+### 5.5 Chunkwise Parallel Form
 
 The output for each chunk splits into inter-chunk (state from previous chunks) and intra-chunk (local interactions) terms:
 

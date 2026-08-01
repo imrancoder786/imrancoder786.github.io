@@ -1,4 +1,18 @@
-User-agent: *
-Allow: /
+    User-agent: *
+    Allow: /
 
-Sitemap: https://imrancoder786.github.io/sitemap.xml
+    # Block non-content paths
+    Disallow: /.git/
+
+    # Crawl-delay for polite crawling
+    Crawl-delay: 1
+
+    # Google-specific: allow all content
+    User-agent: Googlebot
+    Allow: /
+
+    # Bing-specific
+    User-agent: Bingbot
+    Allow: /
+
+    Sitemap: https://imrancoder786.github.io/sitemap.xml

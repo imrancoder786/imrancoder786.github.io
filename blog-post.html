@@ -48,11 +48,33 @@
     <div class="min-h-screen">
         <div class="layout-wrapper">
             <header></header>
-            
-            <main id="post-content">
-                <!-- Blog post content will be dynamically rendered here -->
-            </main>
-            
+        </div>
+
+        <!-- Blog post layout: sidebar TOC + content -->
+        <div class="blog-post-layout" id="blog-post-layout">
+            <nav class="toc-sidebar" id="toc-sidebar" aria-label="Table of Contents">
+                <div class="toc-title">On this page</div>
+                <ol id="toc-list">
+                    <!-- Auto-generated from headings -->
+                </ol>
+            </nav>
+
+            <div class="blog-post-content">
+                <main id="post-content">
+                    <!-- Blog post content will be dynamically rendered here -->
+                </main>
+            </div>
+        </div>
+
+        <!-- Mobile TOC toggle button -->
+        <button class="toc-mobile-toggle" id="toc-mobile-toggle" aria-label="Toggle table of contents" title="Table of Contents">
+            ☰
+        </button>
+
+        <!-- Mobile overlay backdrop -->
+        <div class="toc-mobile-overlay" id="toc-mobile-overlay"></div>
+
+        <div class="layout-wrapper" style="padding-top: 0;">
             <footer></footer>
         </div>
     </div>
@@ -215,7 +237,208 @@
                     console.warn("Mermaid render error:", e);
                 }
             }
+
+            // 4. Build Sidebar TOC from rendered headings
+            buildSidebarTOC();
+
+            // 5. Setup scroll-based active heading tracking
+            setupScrollSpy();
+
+            // 6. Setup mobile TOC toggle
+            setupMobileTOC();
         });
+
+        /**
+         * Extracts h2 headings from the rendered article
+         * and populates the sidebar TOC (main sections only).
+         */
+        function buildSidebarTOC() {
+            const article = document.querySelector('.markdown-body');
+            const tocList = document.getElementById('toc-list');
+            if (!article || !tocList) return;
+
+            const headings = article.querySelectorAll('h2');
+            if (headings.length === 0) {
+                // No headings — hide sidebar entirely
+                const sidebar = document.getElementById('toc-sidebar');
+                if (sidebar) sidebar.style.display = 'none';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            headings.forEach(heading => {
+                const id = heading.id;
+                if (!id) return;
+
+                // Clean heading text: strip HTML tags, trim
+                const text = heading.textContent.trim();
+                if (!text) return;
+
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${id}`;
+                a.textContent = text;
+                a.setAttribute('data-target', id);
+
+                // Smooth scroll on click
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = document.getElementById(id);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // Update URL hash without jumping
+                        history.replaceState(null, '', `#${id}`);
+                    }
+                    // Close mobile TOC if open
+                    closeMobileTOC();
+                });
+
+                li.appendChild(a);
+                fragment.appendChild(li);
+            });
+
+            tocList.appendChild(fragment);
+        }
+
+        /**
+         * Uses IntersectionObserver to highlight the current section
+         * in the sidebar TOC as the user scrolls.
+         */
+        function setupScrollSpy() {
+            const tocLinks = document.querySelectorAll('#toc-list a');
+            if (tocLinks.length === 0) return;
+
+            const headingIds = Array.from(tocLinks).map(a => a.getAttribute('data-target'));
+            const headingElements = headingIds
+                .map(id => document.getElementById(id))
+                .filter(Boolean);
+
+            if (headingElements.length === 0) return;
+
+            let currentActive = null;
+
+            const observer = new IntersectionObserver((entries) => {
+                // Find the topmost visible heading
+                let topHeading = null;
+                let topY = Infinity;
+
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const rect = entry.boundingClientRect;
+                        if (rect.top < topY) {
+                            topY = rect.top;
+                            topHeading = entry.target;
+                        }
+                    }
+                });
+
+                if (topHeading) {
+                    setActiveTOCLink(topHeading.id);
+                }
+            }, {
+                rootMargin: '-10% 0px -80% 0px',
+                threshold: 0
+            });
+
+            headingElements.forEach(el => observer.observe(el));
+
+            // Also handle scroll for fallback — find the heading closest to top
+            let scrollTimeout;
+            window.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    let closest = null;
+                    let closestDist = Infinity;
+
+                    headingElements.forEach(el => {
+                        const rect = el.getBoundingClientRect();
+                        const dist = Math.abs(rect.top - 80);
+                        if (rect.top <= 120 && dist < closestDist) {
+                            closestDist = dist;
+                            closest = el;
+                        }
+                    });
+
+                    if (closest) {
+                        setActiveTOCLink(closest.id);
+                    }
+                }, 50);
+            }, { passive: true });
+        }
+
+        /**
+         * Highlights a specific TOC link and removes highlight from others.
+         */
+        function setActiveTOCLink(id) {
+            const tocLinks = document.querySelectorAll('#toc-list a');
+            tocLinks.forEach(link => {
+                if (link.getAttribute('data-target') === id) {
+                    link.classList.add('toc-active');
+                    // Scroll the TOC sidebar so the active link is visible
+                    const sidebar = document.getElementById('toc-sidebar');
+                    if (sidebar) {
+                        const linkTop = link.offsetTop;
+                        const sidebarScroll = sidebar.scrollTop;
+                        const sidebarHeight = sidebar.clientHeight;
+                        if (linkTop < sidebarScroll || linkTop > sidebarScroll + sidebarHeight - 40) {
+                            sidebar.scrollTo({ top: linkTop - sidebarHeight / 3, behavior: 'smooth' });
+                        }
+                    }
+                } else {
+                    link.classList.remove('toc-active');
+                }
+            });
+        }
+
+        /**
+         * Sets up the mobile TOC drawer toggle.
+         */
+        function setupMobileTOC() {
+            const toggle = document.getElementById('toc-mobile-toggle');
+            const overlay = document.getElementById('toc-mobile-overlay');
+            const sidebar = document.getElementById('toc-sidebar');
+
+            if (!toggle || !overlay || !sidebar) return;
+
+            toggle.addEventListener('click', () => {
+                const isOpen = sidebar.classList.contains('mobile-open');
+                if (isOpen) {
+                    closeMobileTOC();
+                } else {
+                    openMobileTOC();
+                }
+            });
+
+            overlay.addEventListener('click', closeMobileTOC);
+        }
+
+        function openMobileTOC() {
+            const sidebar = document.getElementById('toc-sidebar');
+            const overlay = document.getElementById('toc-mobile-overlay');
+            const toggle = document.getElementById('toc-mobile-toggle');
+
+            if (sidebar) sidebar.classList.add('mobile-open');
+            if (overlay) {
+                overlay.style.display = 'block';
+                requestAnimationFrame(() => overlay.classList.add('visible'));
+            }
+            if (toggle) toggle.innerHTML = '✕';
+        }
+
+        function closeMobileTOC() {
+            const sidebar = document.getElementById('toc-sidebar');
+            const overlay = document.getElementById('toc-mobile-overlay');
+            const toggle = document.getElementById('toc-mobile-toggle');
+
+            if (sidebar) sidebar.classList.remove('mobile-open');
+            if (overlay) {
+                overlay.classList.remove('visible');
+                setTimeout(() => { overlay.style.display = 'none'; }, 300);
+            }
+            if (toggle) toggle.innerHTML = '☰';
+        }
     </script>
 </body>
 </html>
+

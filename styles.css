@@ -344,3 +344,198 @@ li {
 .markdown-body tbody tr:hover {
   background-color: rgba(0, 0, 0, 0.04);
 }
+
+/* ===== Sidebar Table of Contents ===== */
+
+/* Blog post page uses a wider layout to fit the sidebar */
+.blog-post-layout {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  box-sizing: border-box;
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+/* The sidebar TOC container */
+.toc-sidebar {
+  position: sticky;
+  top: 2rem;
+  width: 240px;
+  min-width: 240px;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  padding: 1rem 0;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.55;
+  border-right: 1px solid var(--border);
+  padding-right: 1.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.toc-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.toc-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.toc-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.toc-sidebar .toc-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.toc-sidebar ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-sidebar li {
+  margin: 0;
+  padding: 0;
+}
+
+.toc-sidebar a {
+  display: block;
+  padding: 0.3rem 0.5rem;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  border-radius: 4px;
+  border-left: 2px solid transparent;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.toc-sidebar a:hover {
+  color: var(--foreground);
+  background-color: var(--muted);
+}
+
+.toc-sidebar a.toc-active {
+  color: var(--accent);
+  background-color: rgba(122, 31, 31, 0.06);
+  border-left-color: var(--accent);
+  font-weight: 500;
+}
+
+/* Indent sub-headings (h3) */
+.toc-sidebar .toc-h3 {
+  padding-left: 1.1rem;
+  font-size: 11.5px;
+}
+
+/* The main content column */
+.blog-post-content {
+  flex: 1;
+  min-width: 0;
+  max-width: 720px;
+}
+
+/* Hide the inline <details> TOC on desktop when sidebar is visible */
+@media (min-width: 1100px) {
+  .markdown-body details:first-of-type {
+    display: none;
+  }
+}
+
+/* Mobile TOC toggle button */
+.toc-mobile-toggle {
+  display: none;
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 1001;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--accent);
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-items: center;
+  justify-content: center;
+}
+
+.toc-mobile-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile overlay backdrop */
+.toc-mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.toc-mobile-overlay.visible {
+  opacity: 1;
+}
+
+/* Responsive: hide sidebar on small screens, show mobile toggle */
+@media (max-width: 1099px) {
+  .blog-post-layout {
+    display: block;
+    max-width: 720px;
+  }
+
+  .toc-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    min-width: 280px;
+    max-height: 100vh;
+    z-index: 1000;
+    background: var(--background);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1.25rem;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+  }
+
+  .toc-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .toc-mobile-toggle {
+    display: flex;
+  }
+
+  .blog-post-content {
+    max-width: 100%;
+  }
+
+  /* Show the inline details TOC on mobile */
+  .markdown-body details:first-of-type {
+    display: block;
+  }
+}
+

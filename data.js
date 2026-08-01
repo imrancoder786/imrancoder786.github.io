@@ -120,18 +120,18 @@ window.PORTFOLIO_DATA = {
   
   posts: [
     {
+      slug: "kimi-k3-deep-dive",
+      title: "Kimi K3 Deep Dive — Architecture, Training & Benchmarks of the First 3-Trillion-Parameter Open-Weight Model",
+      date: "2026-07-30",
+      summary: " technical overview of Moonshot AI's Kimi K3 — a 2.78-trillion-parameter open-weight model. Covers Kimi Delta Attention (KDA), Attention Residuals, Stable LatentMoE with 896 experts, NoPE (no positional encoding), native MoonViT-V2 vision, 1M-token context, Quantile Balancing, SiTU-GLU, MXFP4 quantisation-aware training, the 51-million sandbox RL environment stack, and benchmark analysis against Claude Fable 5 and GPT-5.6 Sol.",
+      file: "posts/kimi_k3_deep_dive.md"
+    },
+    {
       slug: "transformer-from-scratch",
       title: "Transformer From Scratch — English-to-Tamil Translation",
       date: "2026-07-20",
       summary: "A complete step-by-step PyTorch tutorial and mathematical guide to building the Transformer architecture from scratch ('Attention Is All You Need') for English-to-Tamil machine translation.",
       file: "posts/transformer_from_scratch.md"
-    },
-    {
-      slug: "kimi-3 deep dive",
-      title: "Let's dive into KIMI-3 architecture overview",
-      date: "2026-07-20",
-      summary: "Key stats (2.78T params, 104.2B active, 1M context), architecture overview.",
-      file: "posts/kimi_k3_deep_dive.md"
     }
   ]
 };
