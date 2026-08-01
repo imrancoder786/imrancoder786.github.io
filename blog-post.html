@@ -68,6 +68,26 @@
             if (typeof marked !== "undefined" && typeof markedKatex !== "undefined") {
                 marked.use(markedKatex({ throwOnError: false }));
             }
+
+            // Custom heading renderer: generates id attributes for TOC anchor links
+            if (typeof marked !== "undefined") {
+                const renderer = new marked.Renderer();
+                renderer.heading = function(data) {
+                    // data can be { text, depth, raw } in newer marked versions
+                    const text = typeof data === 'object' ? data.text : data;
+                    const depth = typeof data === 'object' ? data.depth : arguments[1];
+                    // Strip HTML tags for the slug, then create GitHub-style anchor ID
+                    const rawText = text.replace(/<[^>]*>/g, '');
+                    const slug = rawText
+                        .toLowerCase()
+                        .replace(/[^\w\s-]/g, '')   // remove special chars except hyphens
+                        .replace(/\s+/g, '-')        // spaces to hyphens
+                        .replace(/-+/g, '-')         // collapse multiple hyphens
+                        .replace(/^-|-$/g, '');      // trim leading/trailing hyphens
+                    return `<h${depth} id="${slug}">${text}</h${depth}>`;
+                };
+                marked.use({ renderer });
+            }
             
             // Extract post query param
             const urlParams = new URLSearchParams(window.location.search);

@@ -125,6 +125,13 @@ window.PORTFOLIO_DATA = {
       date: "2026-07-20",
       summary: "A complete step-by-step PyTorch tutorial and mathematical guide to building the Transformer architecture from scratch ('Attention Is All You Need') for English-to-Tamil machine translation.",
       file: "posts/transformer_from_scratch.md"
+    },
+    {
+      slug: "kimi-3 deep dive",
+      title: "Let's dive into KIMI-3 architecture overview",
+      date: "2026-07-20",
+      summary: "Key stats (2.78T params, 104.2B active, 1M context), architecture overview.",
+      file: "posts/kimi_k3_deep_dive.md"
     }
   ]
 };
