@@ -28,8 +28,7 @@
 17. [The Kimi Lineage: From K1.5 to K3](#17-the-kimi-lineage-from-k15-to-k3)
 18. [Practical Implications: Serving & Inference](#18-practical-implications-serving-inference)
 19. [Conclusion & What This Means for the Field](#19-conclusion-what-this-means-for-the-field)
-20. [Glossary of Key Terms](#20-glossary-of-key-terms)
-21. [References](#21-references)
+20. [References](#20-references)
 
 </details>
 
@@ -77,7 +76,7 @@ The real surprise isn't the parameter count — it's that three-quarters of the 
 Most model releases in 2025–26 scaled one thing. Kimi K3 is unusual because it scales a foundation — and it does so by attacking a single question from three angles simultaneously:
 
 <div align="center">
-    <img src="posts/images/kimi_1.png" alt="positional embedding" width="700">
+    <img src="posts/images/kimi_1.png" alt="Three Axes of Information Flow in Kimi K3" width="700">
 </div>
 
 
@@ -101,7 +100,7 @@ A transformer moves information in three directions — **along the sequence, up
 ## 3. Full Architecture
 
 <div align="center">
-    <img src="posts/images/k3_full.png" alt="positional embedding" width="700">
+    <img src="posts/images/k3_full.png" alt="Full Kimi K3 Hybrid Architecture Diagram" width="700">
 </div>
 
 **The whole architecture.** One block = 3 × (KDA + Stable LatentMoE) then 1 × (Gated MLA + Stable LatentMoE).
@@ -162,7 +161,7 @@ Almost nothing survived the K2 → K3 transition untouched. Here is the full arc
 ## 5. Deep Dive: Kimi Delta Attention (KDA) — Sequence Mixing
 
 <div align="center">
-    <img src="posts/images/kad.png" alt="positional embedding" width="600">
+    <img src="posts/images/kad.png" alt="Kimi Delta Attention Recurrence Mechanism" width="600">
 </div>
 
 ### 5.1 The Problem: Softmax Attention Doesn't Scale to 1M Tokens
@@ -219,7 +218,7 @@ With **$g_{\min} = -5$** (fixed) and $A_h$ learnable per head (initialised to 0)
 > **The payoff is huge:** Because rescaling can no longer overflow, **every causal tile — diagonal included — becomes a dense Tensor Core matmul.** The special-cased position-pair path disappears entirely. A numerical guarantee bought a kernel simplification, which bought throughput. This is the paper's tightest example of algorithm–system co-design.
 
 <div align="center">
-    <img src="posts/images/k3_bound.png" alt="positional embedding" width="700">
+    <img src="posts/images/k3_bound.png" alt="g_min Bounded Sigmoidal Log-Decay" width="700">
 </div>
 
 ### 5.5 Chunkwise Parallel Form
@@ -260,7 +259,7 @@ Prototype results from Kimi Linear (the 48B precursor) showed:
 ## 6. Deep Dive: Attention Residuals (AttnRes) — Depth Mixing
 
 <div align="center">
-    <img src="posts/images/att_res.png" alt="positional embedding" width="700">
+    <img src="posts/images/att_res.png" alt="Attention Residuals Cross-Layer Information Retrieval" width="700">
 </div>
 
 ### 6.1 The Residual Stream Bottleneck
@@ -289,13 +288,7 @@ Without RMSNorm, layers that produce large-magnitude outputs would dominate atte
 
 ### 6.3 Block AttnRes: The Version That Actually Ships
 
-Kimi K3’s innovation is that AttnRes no longer forces 
-𝑂
-(
-𝐿
-𝑑
-)
- memory scaling. Instead, it leverages Kimi Delta Attention and Kimi-Linear to keep memory constant, enabling practical 1M-token contexts.
+Kimi K3’s innovation is that AttnRes no longer forces $O(L \cdot d)$ memory scaling. Instead, it leverages Kimi Delta Attention and Block-level summaries to keep depth attention lightweight, enabling practical 1M-token contexts.
 
 
 K3 partitions its 93 layers into **8 blocks of 12** (`attn_res_block_size: 12`):
@@ -324,7 +317,7 @@ The first layer of each block attends only over previous **block summaries**. Su
 896 experts, 16 active. That’s a sparsity ratio of 56 — up from 48 in K2 — and it is where most of K3’s 2.78T parameters live. It’s also where things break.
 
 <div align="center">
-    <img src="posts/images/k3_moe.png" alt="positional embedding" width="700">
+    <img src="posts/images/k3_moe.png" alt="Stable LatentMoE Width Mixing & Routing Diagram" width="700">
 </div>
 
 ### 7.1 The Communication Bottleneck
@@ -399,7 +392,7 @@ The old DeepSeek-V3 update nudges this bias by a fixed step: $b_j^{(t+1)} = b_j^
 ### 8.3 Quantile Balancing: One Exact Jump, No Learning Rate
 
 <div align="center">
-    <img src="posts/images/qb.png" alt="positional embedding" width="700">
+    <img src="posts/images/qb.png" alt="Quantile Balancing vs Sign-SGD Load Balancing" width="700">
 </div>
 
 **Quantile Balancing** throws out the step size entirely:
@@ -505,7 +498,7 @@ Standard practice: bolt on a contrastively pre-trained vision encoder (SigLIP). 
 **The reason isn't quality — it's stability.** A SigLIP-initialised tower shows persistently higher gradient norms with frequent spikes during joint optimisation; the from-scratch tower stays flat. And it **matches SigLIP on every vision benchmark**.
 
 <div align="center">
-    <img src="posts/images/k3_v_train.png" alt="positional embedding" width="700">
+    <img src="posts/images/k3_v_train.png" alt="MoonViT-V2 Vision Encoder Training From Scratch" width="700">
 </div>
 
 ### 11.2 Vision Architecture Details
@@ -526,7 +519,7 @@ The vision path includes careful engineering:
 The headline efficiency number is a **fitted scaling-law curve**, not a single measurement. Moonshot re-ran dedicated scaling-law studies and fitted loss-versus-FLOPs curves for K2 and K3 on held-out out-of-distribution validation data.
 
 <div align="center">
-    <img src="posts/images/k3_tranning.png" alt="positional embedding" width="700">
+    <img src="posts/images/k3_tranning.png" alt="Kimi K3 Pre-Training Loss & Scaling Efficiency Curves" width="700">
 </div>
 
 **What 2.5× means:** To reach a given validation loss, K3's architecture needs about **1/2.5 of the compute K2's did** — same loss for ~40% of the FLOPs.
@@ -575,7 +568,7 @@ Two things make this work:
 This is the biggest structural change from K2's post-training. The pipeline has **three stages**:
 
 <div align="center">
-    <img src="posts/images/k3_post.png" alt="positional embedding" width="700">
+    <img src="posts/images/k3_post.png" alt="Three-Stage Post-Training Pipeline & MOPD Distillation" width="700">
 </div>
 
 ### 13.1 Stage 1: SFT Cold Start
@@ -627,7 +620,7 @@ The harness itself is a collection of configurable, composable modules. Differen
 Agents build a **self-evolving hierarchical knowledge graph** — a DAG grown by recursive, agent-driven web exploration. Sampling nodes at varying granularity produces keyword sets → web queries → real materials → tasks. It's a machine for manufacturing specialised, non-duplicated training tasks in domains you'd never enumerate by hand.
 
 <div align="center">
-    <img src="posts/images/kn_graph.png" alt="positional embedding" width="700">
+    <img src="posts/images/kn_graph.png" alt="Knowledge-Graph-Guided Task Synthesis Pipeline" width="700">
 </div>
 
 ### 14.3 Five Environment Families
@@ -660,7 +653,7 @@ K3's solution: each rank computes two things locally:
 - **Locally-generated state** $\tilde{S}$ (recurrence started from zero)
 
 <div align="center">
-    <img src="posts/images/kda_par.png" alt="positional embedding" width="700">
+    <img src="posts/images/kda_par.png" alt="KDA Context Parallelism Matrix Composition" width="700">
 </div>
 
 $$S_{[i+1]}^t = \tilde{S}_{[i+1]}^t + M_{[i+1]}^{t \leftarrow 1} \cdot S_{[i]}^{T_i}$$
@@ -694,7 +687,7 @@ K3 lands just behind Claude Fable 5 and GPT-5.6 Sol on most benchmarks and **con
 
 | Benchmark | Kimi K3 | Claude Fable 5 | GPT-5.6 Sol | Notes |
 |---|---|---|---|---|
-| **BrowseComp** | **91.2** | 89.4 | 88.7 | #1 at $2.03/task (½ GPT-5.6 cost) |
+| **BrowseComp** | **91.2** | 89.4 | 88.7 | #1 at \$2.03/task (½ GPT-5.6 cost) |
 | **GPQA Diamond** | **93.5** | 92.1 | 91.8 | Highest for open-weight at launch |
 | **Terminal-Bench 2.1** | 88.3 | 90.1 | 87.5 | |
 | **FrontierSWE** | 81.2 | 83.7 | 80.9 | |
@@ -777,17 +770,19 @@ Jul 2026  ─── Kimi K3 (2.78T, 896 experts, top-16)
 
 ## 18. Practical Implications: Serving & Inference
 
-### 18.1 Hardware Requirements
+### 18.1 Hardware Requirements & Serving Infrastructure
 
 | Deployment | Configuration |
 |---|---|
-| **Minimum** | 8× NVIDIA B300 |
-| **Realistic serving** | 64-GPU supernode or NVL72 rack |
-| **Day-zero support** | vLLM (high-performance serving) |
+| **Minimum Node** | 8× NVIDIA B300 (or equivalent FP8/FP4 tensor core node) |
+| **Production Serving** | 64-GPU supernode / NVL72 rack with high-speed NVLink interconnect |
+| **Serving Framework** | vLLM (day-zero support for LatentMoE and KDA chunkwise execution) |
 
+### 18.2 Speculative Decoding & Quantization Strategy
 
----
-
+- **EAGLE-3 Speculative Draft Model:** Employs EAGLE-3 speculative decoding to accelerate token generation for long contexts without sacrificing output distribution quality.
+- **Native MXFP4/MXFP8 Execution:** Since expert weights are natively trained in MXFP4 and activations in MXFP8, deployment requires zero post-hoc quantization loss during serving.
+- **KV Cache Footprint:** Thanks to the 3:1 KDA / Gated-MLA hybrid design, KV cache memory footprint is reduced by up to 75% at 1M context, drastically lowering VRAM pressure per user session.
 
 ---
 
@@ -811,31 +806,11 @@ The answer is yes, and the implications are significant:
 
 K3 is not the best model on every benchmark. But it's the **strongest open-weight model ever released**, and it proves the frontier is not the exclusive province of closed labs. The first open model at the 3-trillion-parameter scale is here — built on ideas that anyone can read, implement, and improve.
 
----
-
-## 20. Glossary of Key Terms
-
-| Term | Definition |
-|---|---|
-| **KDA** | Kimi Delta Attention — a linear-attention recurrence with per-channel decay and the delta rule for precise memory management |
-| **NoPE** | No Position Encoding — relying entirely on KDA's recurrence for position, enabling effortless extrapolation to 1M tokens |
-| **AttnRes** | Attention Residuals — replacing the residual stream with attention over depth, using learnable pseudo-queries |
-| **Block AttnRes** | Practical form: 8 blocks of 12 layers, attend across block summaries. O(Nd) instead of O(Ld) |
-| **Stable LatentMoE** | MoE where routed experts operate at half width (ℓ=3584) with RMSNorm, SiTU-GLU, and Quantile Balancing |
-| **SiTU-GLU** | Sigmoid Tanh Unit GLU — bounded SwiGLU variant with $\|output\|_\infty \leq 100$ |
-| **Quantile Balancing** | Load balancing that sets expert bias from the router-score quantile matching target load. No learning rate |
-| **Sparsity Ratio** | Total experts ÷ active experts per token. K3: 896/16 = 56 |
-| **Per-Head Muon** | Muon with Newton–Schulz orthogonalisation applied per attention head, not per projection |
-| **MOPD** | Multi-Teacher On-Policy Distillation — consolidating 9 domain×effort experts into one model |
-| **MXFP4/MXFP8** | Microscaling 4-bit/8-bit floating-point. K3's expert weights are MXFP4, activations MXFP8 |
-| **XTML** | eXtensible Token Markup Language — K3's chat template with unambiguous element boundaries |
-| **KCP** | KDA Context Parallelism — sequence splitting across GPUs using associative transition composition |
-| **MoonEP** | Perfect expert-parallel load balance with at most E/R redundant experts per rank |
-| **Partial Rollout** | Pausing RL generation once fraction λ of trajectories complete; resuming stragglers next iteration |
+I hope you had a great time reading this. Share an interesting idea or just drop in a Hi at laptop14072024@gmail.com! Until next time 👋
 
 ---
 
-## 21. References
+## 20. References
 
 1. **Kimi K3 Technical Report.** Kimi Team, Moonshot AI. arXiv:2607.24653. [arxiv.org](https://arxiv.org/abs/2607.24653)
 
@@ -863,4 +838,3 @@ K3 is not the best model on every benchmark. But it's the **strongest open-weigh
 
 ---
 
-*This blog post is a technical deep-dive for researchers and practitioners interested in the architectural innovations behind the largest open-weight model as of July 2026. For a visual, interactive walkthrough, visit [k3kimi.netlify.app](https://k3kimi.netlify.app/). For Sebastian Raschka's concise architecture notes, see [his blog post](https://sebastianraschka.com/blog/2026/kimi-k3-architecture-notes.html). For the full technical report, see [arXiv:2607.24653](https://arxiv.org/abs/2607.24653).*

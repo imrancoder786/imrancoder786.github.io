@@ -123,7 +123,7 @@ window.PORTFOLIO_DATA = {
       slug: "kimi-k3-deep-dive",
       title: "Kimi K3 Deep Dive — Architecture, Training & Benchmarks of the First 3-Trillion-Parameter Open-Weight Model",
       date: "2026-07-30",
-      summary: " technical overview of Moonshot AI's Kimi K3 — a 2.78-trillion-parameter open-weight model. Covers Kimi Delta Attention (KDA), Attention Residuals, Stable LatentMoE with 896 experts, NoPE (no positional encoding), native MoonViT-V2 vision, 1M-token context, Quantile Balancing, SiTU-GLU, MXFP4 quantisation-aware training, the 51-million sandbox RL environment stack, and benchmark analysis against Claude Fable 5 and GPT-5.6 Sol.",
+      summary: "A comprehensive technical overview of Moonshot AI's Kimi K3 — a 2.78-trillion-parameter open-weight model. Covers Kimi Delta Attention (KDA), Attention Residuals, Stable LatentMoE with 896 experts, NoPE (no positional encoding), native MoonViT-V2 vision, 1M-token context, Quantile Balancing, SiTU-GLU, MXFP4 quantisation-aware training, the 51-million sandbox RL environment stack, and benchmark analysis against Claude Fable 5 and GPT-5.6 Sol.",
       file: "posts/kimi_k3_deep_dive.md"
     },
     {
