@@ -270,7 +270,6 @@ $$h_l = h_{l-1} + f_l(h_{l-1})$$
 
 A **single running sum.** The paper's observation is razor-sharp: *this is exactly the bottleneck that recurrence had over time, and which attention was invented to fix.* By the time you're deep in the network, early layers have been diluted to almost nothing, and layer 80 has **no way to say "I specifically want what layer 14 computed."**
 
-As [Sebastian Raschka notes](https://sebastianraschka.com/blog/2026/kimi-k3-architecture-notes.html): this is **the only non-efficiency change** in K3 — it's a genuine attempt to make the model *better*, not just cheaper.
 
 ### 6.2 How AttnRes Works
 
